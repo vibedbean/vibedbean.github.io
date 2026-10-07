@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <!-- Primary Meta Tags -->
+  <title>PokéBlur</title>
+  <meta name="title" content="PokéBlur" />
+  <meta name="description" content="Guess the daily Pokémon as they unblur! Play Daily, Unlimited, Timed, and Reverse Hint modes, or battle friends live in Versus multiplayer." />
+
+  <!-- Open Graph / Facebook / Discord / iMessage Cards -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://vibedbean.github.io/" />
+  <meta property="og:site_name" content="PokéBlur" />
+  <meta property="og:title" content="PokéBlur - Daily Pokémon Guessing Game" />
+  <meta property="og:description" content="Test your Pokémon knowledge! Unblur images, race the clock in Timed Mode, flip hints in Reverse Mode, or battle friends live in Versus multiplayer." />
+  <meta property="og:image" content="https://vibedbean.github.io/preview.png?v=2" />
+  <meta property="og:image:secure_url" content="https://vibedbean.github.io/preview.png?v=2" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="PokéBlur - guess the Pokémon as it unblurs" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://vibedbean.github.io/" />
+  <meta name="twitter:title" content="PokéBlur - Daily Pokémon Guessing Game" />
+  <meta name="twitter:description" content="Test your Pokémon knowledge! Unblur images, race the clock in Timed Mode, flip hints in Reverse Mode, or battle friends live in Versus multiplayer." />
+  <meta name="twitter:image" content="https://vibedbean.github.io/preview.png?v=2" />
+  <meta name="twitter:image:alt" content="PokéBlur - guess the Pokémon as it unblurs" />
+
+  <!-- Tells Google explicitly this site is called "PokéBlur", not "GitHub Pages
+       documentation" (which is what it was showing without this). -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "PokéBlur",
+    "alternateName": ["PokeBlur", "Poke Blur"],
+    "url": "https://vibedbean.github.io/"
+  }
+  </script>
+
+  <!-- Open connections to the data/image hosts early so the first Pokémon shows sooner -->
+  <link rel="preconnect" href="https://pokeapi.co" crossorigin />
+  <link rel="preconnect" href="https://raw.githubusercontent.com" />
+  <link rel="stylesheet" href="style.css?v=2026-10-12" />
+  <link rel="canonical" href="https://vibedbean.github.io/" />
+  <link rel="icon" href="favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="192x192" href="favicon.png" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+</head>
+<body>
+  <!-- Top Full-Width Navigation Bar (No Emojis) -->
+  <header class="top-header">
+    <div class="header-left">
+      <h1 class="logo-title">PokéBlur</h1>
+      <nav class="nav-links">
+        <button id="mode-daily-btn" class="nav-tab active">Daily Puzzle</button>
+        <button id="mode-unlimited-btn" class="nav-tab">Unlimited Mode</button>
+        <button id="mode-timed-btn" class="nav-tab">Timed Mode</button>
+        <button id="mode-reverse-btn" class="nav-tab">Reverse Mode</button>
+        <button id="mode-versus-btn" class="nav-tab">Versus</button>
+      </nav>
+    </div>
+
+    <!-- Pokédex: its own button at the right end, not a sixth mode tab -->
+    <button id="dex-open-btn" class="dex-header-btn" type="button" data-open-dex aria-label="Open Pokédex">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M2.5 12h6.2M15.3 12h6.2"/><circle cx="12" cy="12" r="3.2"/></svg>
+      <span class="dex-header-label">Pokédex</span>
+      <span id="dex-header-count" class="dex-count">0</span>
+    </button>
+
+    <!-- Settings -->
+    <button id="settings-open-btn" class="settings-header-btn" type="button" data-open-settings aria-label="Settings" title="Settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+    </button>
+  </header>
+
+  <!-- Main Content Wrapper -->
+  <main class="main-content">
+
+    <!-- DAILY PUZZLE VIEW -->
+    <div id="daily-view">
+      <header class="game-header">
+        <h2 id="puzzle-date-label">Loading...</h2>
+        <p id="round-label">Round 1 / 5 - Score: 0</p>
+        <p id="stage-label" class="stage-pending">Stage 1 - Guess for 5 points</p>
+      </header>
+
+      <!-- Image Box Container -->
+      <div class="image-wrapper">
+        <div id="image-loading-overlay" class="overlay">Loading...</div>
+        <img id="pokemon-image" src="" alt="Pokémon" />
+      </div>
+
+      <!-- Start Screen Panel -->
+      <div id="start-screen">
+        <p class="subtitle">Guess the 5 daily Pokémon as they unblur!</p>
+        <button id="start-btn" class="primary-btn">Start Daily Game</button>
+        <div class="dex-chip-row"><button type="button" class="dex-chip" data-open-dex>Pokédex <b data-dex-count>0 / 1025</b></button></div>
+      </div>
+
+      <!-- Input and Suggestions -->
+      <div id="search-wrapper" class="hidden">
+        <input type="text" id="guess-input" placeholder="Type a Pokémon name..." autocomplete="off" />
+        <div id="suggestions"></div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div id="buttons" class="hidden">
+        <button id="skip-btn" class="action-btn">Skip / Next Stage</button>
+        <button id="next-btn" class="action-btn hidden">Next Pokémon ➔</button>
+      </div>
+
+      <p id="result-message"></p>
+
+      <!-- Game Over Modal / Panel -->
+      <div id="game-over-panel" class="hidden">
+        <button id="game-over-close" class="panel-close" type="button" aria-label="Close results and view today's Pokémon" title="Close and view today's Pokémon">&#10005;</button>
+        <h2>Game Complete!</h2>
+        <p id="final-score-text"></p>
+        <p id="stats-line"></p>
+        
+        <div class="stats-summary">
+          <div>Played: <span id="stat-played">0</span></div>
+          <div>Avg Score: <span id="stat-avg">0.0</span></div>
+          <div>Streak: <span id="stat-streak">0</span></div>
+        </div>
+        <p id="streak-best" class="streak-best"></p>
+
+        <button id="share-btn" class="action-btn">Share Results</button>
+        <button type="button" class="action-btn dex-view-btn" data-open-dex>View Pokédex</button>
+        <p class="daily-countdown">Next puzzle in <span class="daily-countdown-time">--:--:--</span></p>
+      </div>
+
+      <!-- Look back at today's five Pokémon (opened with the X on the results panel) -->
+      <div id="daily-review" class="hidden">
+        <p id="daily-review-name" class="review-name"></p>
+        <p id="daily-review-points" class="review-points"></p>
+        <div id="daily-review-chips" class="review-chips">
+          <button type="button" class="review-chip" data-round="1" aria-label="Pokémon 1">1</button>
+          <button type="button" class="review-chip" data-round="2" aria-label="Pokémon 2">2</button>
+          <button type="button" class="review-chip" data-round="3" aria-label="Pokémon 3">3</button>
+          <button type="button" class="review-chip" data-round="4" aria-label="Pokémon 4">4</button>
+          <button type="button" class="review-chip" data-round="5" aria-label="Pokémon 5">5</button>
+        </div>
+        <button id="daily-review-results-btn" class="action-btn" type="button">Show results</button>
+        <p class="daily-countdown">Next puzzle in <span class="daily-countdown-time">--:--:--</span></p>
+      </div>
+    </div>
+
+    <!-- UNLIMITED MODE VIEW -->
+    <div id="unlimited-view" class="hidden">
+      <div class="unlimited-header-nav">
+        <button id="unlimited-normal-btn" class="mode-toggle-btn active">Normal Mode</button>
+        <button id="unlimited-shiny-btn" class="mode-toggle-btn">Shiny Mode</button>
+      </div>
+
+      <!-- Generation Filter Container (Hides when game starts) -->
+      <div id="gen-filter-container" class="gen-filter-wrapper">
+        <span class="gen-filter-label">Filter Generations:</span>
+        <div class="gen-buttons-grid">
+          <button class="gen-btn active all-btn" id="gen-all-btn">All Generations</button>
+          <button class="gen-btn active" data-gen="1">1</button>
+          <button class="gen-btn active" data-gen="2">2</button>
+          <button class="gen-btn active" data-gen="3">3</button>
+          <button class="gen-btn active" data-gen="4">4</button>
+          <button class="gen-btn active" data-gen="5">5</button>
+          <button class="gen-btn active" data-gen="6">6</button>
+          <button class="gen-btn active" data-gen="7">7</button>
+          <button class="gen-btn active" data-gen="8">8</button>
+          <button class="gen-btn active" data-gen="9">9</button>
+        </div>
+      </div>
+
+      <header class="game-header">
+        <h2 id="unlimited-mode-title">Unlimited - Normal Mode</h2>
+        <p id="unlimited-round-label">Round 1 / 5 - Score: 0</p>
+        <p id="unlimited-stage-label" class="stage-pending">Stage 1 - Guess for 5 points</p>
+      </header>
+
+      <!-- Unlimited Image Box -->
+      <div class="image-wrapper">
+        <div id="unlimited-image-overlay" class="overlay">Loading...</div>
+        <img id="unlimited-pokemon-image" src="" alt="Pokémon" />
+      </div>
+
+      <!-- Unlimited Start Screen -->
+      <div id="unlimited-start-screen">
+        <p class="subtitle">Play infinite rounds of random Pokémon!</p>
+        <button id="unlimited-start-btn" class="primary-btn">Start Unlimited Game</button>
+        <div class="dex-chip-row"><button type="button" class="dex-chip" data-open-dex>Pokédex <b data-dex-count>0 / 1025</b></button></div>
+      </div>
+
+      <!-- Unlimited Search Wrapper -->
+      <div id="unlimited-search-wrapper" class="hidden">
+        <input type="text" id="unlimited-guess-input" placeholder="Type a Pokémon name..." autocomplete="off" />
+        <div id="unlimited-suggestions"></div>
+      </div>
+
+      <!-- Unlimited Action Buttons -->
+      <div id="unlimited-buttons" class="hidden">
+        <button id="unlimited-skip-btn" class="action-btn">Skip / Next Stage</button>
+        <button id="unlimited-next-btn" class="action-btn hidden">Next Pokémon ➔</button>
+      </div>
+
+      <p id="unlimited-result-message"></p>
+
+      <!-- Unlimited Game Over Overlay -->
+      <div id="unlimited-game-over-panel" class="hidden">
+        <h2>Game Complete!</h2>
+        <p id="unlimited-final-score-text"></p>
+        <button id="play-again-btn" class="primary-btn">Play Again</button>
+        <button type="button" class="action-btn dex-view-btn" data-open-dex>View Pokédex</button>
+      </div>
+    </div>
+
+<!-- TIMED MODE VIEW -->
+    <div id="timed-view" class="hidden">
+      <!-- Setup: duration + generation filter (hides when game starts) -->
+      <div id="timed-setup-container">
+        <div class="gen-filter-wrapper">
+          <span class="gen-filter-label">Time Limit:</span>
+          <div class="gen-buttons-grid" id="timed-duration-grid">
+            <button class="gen-btn active" data-duration="30">30 sec</button>
+            <button class="gen-btn" data-duration="60">1 min</button>
+            <button class="gen-btn" data-duration="120">2 min</button>
+            <button class="gen-btn" data-duration="custom" id="timed-custom-btn">Custom</button>
+          </div>
+          <div id="timed-custom-wrapper" class="hidden">
+            <input type="number" id="timed-custom-input" min="10" max="600" placeholder="Seconds (10-600)" />
+          </div>
+        </div>
+
+        <div id="timed-gen-filter-container" class="gen-filter-wrapper">
+          <span class="gen-filter-label">Filter Generations:</span>
+          <div class="gen-buttons-grid">
+            <button class="gen-btn active all-btn" id="timed-gen-all-btn">All Generations</button>
+            <button class="gen-btn active" data-gen="1">1</button>
+            <button class="gen-btn active" data-gen="2">2</button>
+            <button class="gen-btn active" data-gen="3">3</button>
+            <button class="gen-btn active" data-gen="4">4</button>
+            <button class="gen-btn active" data-gen="5">5</button>
+            <button class="gen-btn active" data-gen="6">6</button>
+            <button class="gen-btn active" data-gen="7">7</button>
+            <button class="gen-btn active" data-gen="8">8</button>
+            <button class="gen-btn active" data-gen="9">9</button>
+          </div>
+        </div>
+      </div>
+
+      <header class="game-header">
+        <h2>Timed Mode</h2>
+
+        <!-- Shown before you start: your best for the selected time + generation filter -->
+        <div id="timed-highscore-card" class="highscore-card">
+          <span class="hs-label">Your Best</span>
+          <div class="hs-score"><span id="timed-hs-score">-</span><span class="hs-unit">pts</span></div>
+          <span id="timed-hs-setting" class="hs-setting"></span>
+          <span id="timed-hs-detail" class="hs-detail"></span>
+          <details id="timed-records" class="hs-records hidden">
+            <summary>All records</summary>
+            <ul id="timed-records-list"></ul>
+          </details>
+        </div>
+
+        <!-- Shown during a run -->
+        <p id="timed-stats-label" class="hidden">Score: 0 - Correct: 0</p>
+        <p id="timed-stage-label" class="stage-pending">Stage 1 - Guess for 5 points</p>
+      </header>
+
+      <div id="timed-countdown" class="countdown-badge hidden">30</div>
+
+      <!-- Timed Image Box -->
+      <div class="image-wrapper">
+        <div id="timed-image-overlay" class="overlay">Loading...</div>
+        <img id="timed-pokemon-image" src="" alt="Pokémon" />
+      </div>
+
+      <!-- Timed Start Screen -->
+      <div id="timed-start-screen">
+        <p class="subtitle">Guess as many Pokémon as you can before time runs out!</p>
+        <button id="timed-start-btn" class="primary-btn">Start Timed Game</button>
+        <div class="dex-chip-row"><button type="button" class="dex-chip" data-open-dex>Pokédex <b data-dex-count>0 / 1025</b></button></div>
+      </div>
+
+      <!-- Timed Search Wrapper -->
+      <div id="timed-search-wrapper" class="hidden">
+        <input type="text" id="timed-guess-input" placeholder="Type a Pokémon name..." autocomplete="off" />
+        <div id="timed-suggestions"></div>
+      </div>
+
+      <!-- Timed Action Buttons -->
+      <div id="timed-buttons" class="hidden">
+        <button id="timed-skip-btn" class="action-btn">Skip / Next Stage</button>
+      </div>
+
+      <p id="timed-result-message"></p>
+
+      <!-- Timed Game Over Overlay -->
+      <div id="timed-game-over-panel" class="hidden">
+        <h2>Time's Up!</h2>
+        <p id="timed-final-score-text"></p>
+        <p id="timed-final-best-text"></p>
+        <div class="timed-over-actions">
+          <button id="timed-share-btn" class="action-btn">Share Results</button>
+          <button id="timed-play-again-btn" class="primary-btn">Play Again</button>
+          <button type="button" class="action-btn dex-view-btn" data-open-dex>View Pokédex</button>
+        </div>
+      </div>
+    </div>
+
+<!-- REVERSE MODE VIEW -->
+   <div id="reverse-view" class="hidden">
+     <header class="game-header">
+       <h2>Reverse Mode</h2>
+       <p id="reverse-round-label">Round 1 / 5 - Score: 0</p>
+       <div id="reverse-reward-box" class="reward-box hidden">
+         <span class="reward-label">Current Round Value:</span>
+         <span id="reverse-current-value">0</span>
+         <span class="reward-unit">pts</span>
+         <p class="reward-hint-subtext" style="font-size: 0.85rem; color: #a0a0a0; margin-top: 4px; font-style: italic;">
+           Points are proportional to the number of Pokémon matching revealed hints!
+         </p>
+       </div>
+     </header>
+
+     <!-- Reverse Start Screen -->
+     <div id="reverse-start-screen">
+       <p class="subtitle">
+         Guess the hidden Pokémon! Flip categories to reveal hints, but beware: the amount of points you get is proportional to how many available pokemon there are left. Wrong guesses force a hint flip!
+       </p>
+       <p id="reverse-high-score-display" style="font-size: 1.1rem; color: #f1c40f; font-weight: bold; margin-bottom: 15px;">High Score: 0 pts</p>
+       <button id="reverse-start-btn" class="primary-btn">Start Reverse Game</button>
+     </div>
+
+     <!-- Reverse Gameplay Container -->
+     <div id="reverse-game-play" class="hidden">
+       <!-- Side-by-Side Hints Grid (6 Categories) -->
+       <div class="hints-grid">
+         <button class="hint-tile" data-category="generation">
+           <span class="tile-label">Generation</span>
+           <span class="tile-value">???</span>
+         </button>
+         <button class="hint-tile" data-category="primaryType">
+           <span class="tile-label">Primary Type</span>
+           <span class="tile-value">???</span>
+         </button>
+         <button class="hint-tile" data-category="secondaryType">
+           <span class="tile-label">Secondary Type</span>
+           <span class="tile-value">???</span>
+         </button>
+         <button class="hint-tile" data-category="form">
+           <span class="tile-label">Form</span>
+           <span class="tile-value">???</span>
+         </button>
+         <button class="hint-tile" data-category="bst">
+           <span class="tile-label">Base Stat Total</span>
+           <span class="tile-value">???</span>
+         </button>
+         <button class="hint-tile" data-category="size">
+           <span class="tile-label">Height / Weight</span>
+           <span class="tile-value">???</span>
+         </button>
+       </div>
+
+       <p id="reverse-status-msg" class="reverse-status">Make a guess or tap a category tile to reveal a hint!</p>
+
+       <!-- Search Input matching Daily/Unlimited layout -->
+       <div id="reverse-search-wrapper">
+         <input type="text" id="reverse-guess-input" placeholder="Type a Pokémon name..." autocomplete="off" />
+         <div id="reverse-suggestions" class="suggestions-container"></div>
+       </div>
+
+       <!-- Action Buttons -->
+       <div id="reverse-buttons" class="button-group">
+         <button id="reverse-skip-btn" class="action-btn">Give Up</button>
+         <button id="reverse-next-btn" class="action-btn hidden">Next Pokémon ➔</button>
+       </div>
+     </div>
+
+     <p id="reverse-result-message"></p>
+
+     <!-- Reverse Game Over Panel -->
+     <div id="reverse-game-over-panel" class="game-over-panel hidden">
+       <h2>Game Complete!</h2>
+       <p id="reverse-final-score-text" class="final-score-text"></p>
+       <p id="reverse-final-highscore-text" class="final-highscore-text" style="color: #f1c40f; font-weight: bold; margin-top: 6px;"></p>
+       <button id="reverse-play-again-btn" class="primary-btn" style="margin-top: 15px;">Play Again</button>
+     </div>
+   </div>
+<!-- VERSUS MODE SECTION -->
+<div id="versus-view" class="hidden">
+  <!-- Lobby / Join Screen -->
+  <div id="vs-lobby-screen">
+    <h2 class="vs-heading">Versus Mode</h2>
+    <p class="subtitle">Host or join a friend's room - first to guess each round takes the points!</p>
+
+    <div class="vs-lobby-controls">
+      <button id="vs-create-room-btn" class="primary-btn">Create Room (Host)</button>
+      <div class="vs-join-group">
+        <input type="text" id="vs-room-id-input" placeholder="Enter Room Code..." autocomplete="off" />
+        <button id="vs-join-room-btn" class="action-btn">Join Room</button>
+      </div>
+    </div>
+
+    <div id="vs-lobby-status" class="hidden">
+      <div class="vs-room-code-card">
+        <span class="vs-room-code-label">Room Code</span>
+        <span id="vs-room-code-display">---</span>
+        <button id="vs-copy-code-btn" class="vs-copy-btn" type="button">Copy Link</button>
+      </div>
+
+      <div class="vs-name-edit-group">
+        <label for="vs-my-name-input" class="vs-name-edit-label">Your Name</label>
+        <input type="text" id="vs-my-name-input" maxlength="16" placeholder="Enter your name..." autocomplete="off" />
+      </div>
+
+      <div id="vs-player-slots" class="vs-slots-grid"></div>
+
+      <div id="vs-rounds-selector" class="vs-rounds-selector hidden">
+        <span class="vs-rounds-label">Rounds</span>
+        <div class="vs-rounds-stepper">
+          <button id="vs-rounds-minus" class="vs-stepper-btn" type="button">−</button>
+          <span id="vs-rounds-value">5</span>
+          <button id="vs-rounds-plus" class="vs-stepper-btn" type="button">+</button>
+        </div>
+      </div>
+
+      <button id="vs-start-game-btn" class="primary-btn hidden">Start Game</button>
+      <p id="vs-lobby-hint" class="vs-lobby-hint hidden"></p>
+      <p id="vs-waiting-msg" class="vs-lobby-hint hidden">Waiting for host to start...</p>
+      <button id="vs-lobby-leave-btn" class="action-btn">Leave Lobby</button>
+    </div>
+  </div>
+
+  <!-- Generation Vote Screen -->
+  <div id="vs-vote-screen" class="hidden">
+    <h2 class="vs-heading">Vote on Generations</h2>
+    <p class="subtitle">Pick up to 3 generations you want in this match, or vote Random. Whatever gets any votes is in the pool.</p>
+
+    <div id="vs-vote-timer" class="vs-vote-timer">15</div>
+
+    <div class="gen-filter-wrapper">
+      <span class="gen-filter-label">Your Vote</span>
+      <div class="gen-buttons-grid">
+        <button class="gen-btn all-btn" id="vs-vote-random-btn" type="button">Random / No Preference</button>
+        <button class="gen-btn" data-vote-gen="1" type="button">1</button>
+        <button class="gen-btn" data-vote-gen="2" type="button">2</button>
+        <button class="gen-btn" data-vote-gen="3" type="button">3</button>
+        <button class="gen-btn" data-vote-gen="4" type="button">4</button>
+        <button class="gen-btn" data-vote-gen="5" type="button">5</button>
+        <button class="gen-btn" data-vote-gen="6" type="button">6</button>
+        <button class="gen-btn" data-vote-gen="7" type="button">7</button>
+        <button class="gen-btn" data-vote-gen="8" type="button">8</button>
+        <button class="gen-btn" data-vote-gen="9" type="button">9</button>
+      </div>
+      <p id="vs-vote-picks-left" class="vs-lobby-hint">3 picks remaining</p>
+    </div>
+
+    <p id="vs-vote-status" class="vs-lobby-hint">0 of 0 players have voted</p>
+    <div id="vs-vote-results" class="vs-lobby-hint hidden"></div>
+  </div>
+
+  <!-- Gameplay Screen -->
+  <div id="vs-gameplay-screen" class="hidden">
+    <!-- Wheel Spin Overlay -->
+    <div id="vs-wheel-overlay" class="hidden">
+      <h3>Selecting Round Mode...</h3>
+      <canvas id="wheel-canvas" width="280" height="280"></canvas>
+      <p id="wheel-result-text">Spinning...</p>
+    </div>
+
+    <div id="vs-shiny-banner" class="vs-shiny-banner hidden">It's a SHINY Pokémon this round!</div>
+
+    <header class="game-header">
+      <h2 id="vs-mode-title">Round 1 - Reveal Mode: Classic Blur</h2>
+      <p id="vs-round-label">Round 1 / 5</p>
+    </header>
+
+    <div class="vs-gameplay-layout">
+      <!-- Live Speed Racing Leaderboard (left on desktop, top on mobile) -->
+      <div id="vs-leaderboard" class="vs-leaderboard-box">
+        <h4>Race Progress</h4>
+        <div id="vs-player-bars"></div>
+      </div>
+
+      <!-- Main game column -->
+      <div class="vs-gameplay-main">
+        <div class="image-wrapper">
+          <div id="vs-image-overlay" class="overlay">Loading...</div>
+          <img id="vs-pokemon-image" class="hidden" src="" alt="Pokémon" />
+          <canvas id="vs-reveal-canvas" width="280" height="280"></canvas>
+        </div>
+
+        <!-- Input -->
+        <div id="vs-search-wrapper">
+          <input type="text" id="vs-guess-input" placeholder="Type a Pokémon name..." autocomplete="off" />
+          <div id="vs-suggestions" class="suggestions-container"></div>
+        </div>
+
+        <p id="vs-result-message"></p>
+      </div>
+    </div>
+
+    <div id="vs-round-over-panel" class="hidden">
+      <h3 id="vs-round-winner-text">Round Complete!</h3>
+      <p id="vs-round-answer-text" class="vs-round-answer-text"></p>
+      <p id="vs-waiting-next-msg" class="vs-lobby-hint hidden">Waiting for host to continue...</p>
+    </div>
+
+    <!-- Final Game Over Panel -->
+    <div id="vs-game-over-panel" class="hidden">
+      <h2>Game Over!</h2>
+      <p id="vs-winner-text" class="vs-winner-text"></p>
+      <div id="vs-final-standings" class="vs-final-standings"></div>
+      <div class="vs-game-over-actions">
+        <button id="vs-play-again-btn" class="primary-btn hidden">Play Again</button>
+        <button id="vs-leave-room-btn" class="action-btn">Leave Room</button>
+      </div>
+    </div>
+  </div>
+</div>
+  </main>
+
+  <!-- Fan disclaimer + short privacy note -->
+  <footer class="site-footer">
+    <p><strong>PokéBlur</strong> is a free, unofficial fan-made project. It is not affiliated with, endorsed by, or sponsored by Nintendo, Game Freak, Creatures Inc., or The Pokémon Company. Pokémon and all related names and images are trademarks and copyright of their respective owners. Data and artwork come from <a href="https://pokeapi.co/" target="_blank" rel="noopener noreferrer">PokéAPI</a>.</p>
+    <p><strong>Privacy:</strong> no accounts, no ads, no analytics or tracking. Your scores and progress are saved only in your own browser and are never sent to us. Versus mode connects players directly to each other, so others in your room can technically see your IP address. The services that host the site and its data (GitHub, PokéAPI, jsDelivr, PeerJS) may log standard request details like your IP address, as any website would.</p>
+  </footer>
+
+  <script src="settings.js?v=2026-10-11"></script>
+  <script src="game.js?v=2026-10-12"></script>
+  <script src="keyboard.js?v=2026-10-11"></script>
+  <script src="pokedex.js?v=2026-10-12"></script>
+  <script src="transfer.js?v=2026-10-12"></script>
+  <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  <script src="versus.js?v=2026-10-11"></script>
+  <!-- Bump the ?v= date above every time you deploy a change to game.js/pokedex.js/versus.js.
+       Browsers cache these files aggressively; without a version bump, some
+       visitors keep running stale JS after you push a fix, which is a common
+       cause of "it works for me but not my friend" multiplayer bugs. -->
+</body>
+</html>
