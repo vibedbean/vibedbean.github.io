@@ -13,7 +13,7 @@
 
   // >>> PASTE YOUR WORKER URL HERE after following SETUP.md, e.g. 'https://pokeblur-save.yourname.workers.dev' (no trailing slash).
   // Leave it empty to hide the feature.
-  const PB_SAVE_URL = 'pokeblur-save.salanitrinicholas.workers.dev';
+  const PB_SAVE_URL = 'https://pokeblur-save.salanitrinicholas.workers.dev';
 
   // Keys that follow the player between devices. (Not: daily puzzle state, caches, per-device settings.)
   const SYNC_KEYS = [
