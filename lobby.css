@@ -1,0 +1,437 @@
+/* ==========================================================================================================
+   VERSUS LOBBY SKIN ("arcade at night"). Loaded AFTER style.css / vp.css and scoped to #vs-lobby-screen (+ the page backdrop while it is
+   showing), so removing this one file puts the old look back. No ids/classes that versus.js uses were renamed; this only restyles them.
+   Identity: deep navy night sky with pixel stars and a power-plant skyline, scanlines, hard-edged "pixel" panels with dashed headers,
+   Silkscreen pixel type, ONE warm accent pair (electric yellow = structure, Voltorb red = the action). Phones first: one column down to
+   320px; on a wide screen the menu becomes left controls / empty middle (the scene) / public rooms on the right.
+   ========================================================================================================== */
+
+/* ---- page backdrop, only while the Versus menu/lobby (not a running game) is on screen ---- */
+body:has(#versus-view:not(.hidden) #vs-lobby-screen:not(.hidden)) {
+  background-color: #060b18;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' shape-rendering='crispEdges'%3E%3Cg fill='%23ffd23f'%3E%3Crect x='14' y='22' width='2' height='2' opacity='.55'/%3E%3Crect x='96' y='60' width='2' height='2' opacity='.35'/%3E%3Crect x='150' y='12' width='2' height='2' opacity='.6'/%3E%3Crect x='60' y='140' width='2' height='2' opacity='.4'/%3E%3C/g%3E%3Cg fill='%235ee7ff'%3E%3Crect x='120' y='110' width='2' height='2' opacity='.5'/%3E%3Crect x='40' y='84' width='2' height='2' opacity='.3'/%3E%3Crect x='170' y='160' width='2' height='2' opacity='.45'/%3E%3C/g%3E%3Cg fill='%23fff'%3E%3Crect x='78' y='14' width='1' height='1' opacity='.5'/%3E%3Crect x='28' y='120' width='1' height='1' opacity='.4'/%3E%3Crect x='136' y='70' width='1' height='1' opacity='.4'/%3E%3C/g%3E%3C/svg%3E"),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, .2) 0 1px, transparent 1px 3px),
+    radial-gradient(ellipse 90% 70% at 50% 30%, #1d3366 0%, #0e1b3e 48%, #060b18 100%);
+  background-attachment: fixed;
+}
+/* the skyline: a fixed strip along the bottom, behind everything (pixel towers with a few lit windows) */
+body:has(#versus-view:not(.hidden) #vs-lobby-screen:not(.hidden))::after {
+  content: ""; position: fixed; left: 0; right: 0; bottom: 0; height: 84px; z-index: 0; pointer-events: none; opacity: .9; image-rendering: pixelated;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='84' shape-rendering='crispEdges'%3E%3Cg fill='%23070e22'%3E%3Crect x='0' y='50' width='34' height='34'/%3E%3Crect x='34' y='34' width='26' height='50'/%3E%3Crect x='60' y='58' width='30' height='26'/%3E%3Crect x='90' y='24' width='22' height='60'/%3E%3Crect x='112' y='44' width='36' height='40'/%3E%3Crect x='148' y='60' width='26' height='24'/%3E%3Crect x='174' y='30' width='30' height='54'/%3E%3Crect x='204' y='52' width='56' height='32'/%3E%3Crect x='98' y='14' width='4' height='10'/%3E%3Crect x='186' y='18' width='4' height='12'/%3E%3C/g%3E%3Cg fill='%23ffd23f' opacity='.55'%3E%3Crect x='40' y='42' width='3' height='3'/%3E%3Crect x='48' y='54' width='3' height='3'/%3E%3Crect x='96' y='34' width='3' height='3'/%3E%3Crect x='120' y='54' width='3' height='3'/%3E%3Crect x='180' y='42' width='3' height='3'/%3E%3Crect x='192' y='56' width='3' height='3'/%3E%3Crect x='10' y='60' width='3' height='3'/%3E%3C/g%3E%3Cg fill='%23ff4d4d'%3E%3Crect x='99' y='12' width='2' height='2'/%3E%3Crect x='187' y='16' width='2' height='2'/%3E%3C/g%3E%3C/svg%3E") repeat-x left bottom / 260px 84px;
+}
+body:has(#versus-view:not(.hidden) #vs-lobby-screen:not(.hidden)) .main-content { position: relative; z-index: 1; }
+
+/* .main-content centres its children (shrink-to-fit), which let a fixed max-width push this wider than a phone; fill the column instead */
+#versus-view { width: 100%; }
+
+#vs-lobby-screen {
+  --lb-ink: #060b18; --lb-panel: rgba(9, 17, 38, .92); --lb-panel-2: #0f1c3e; --lb-line: #2a3f73; --lb-line-hi: #4a68b5; --lb-dim: #8aa0c8;
+  --lb-yel: #ffd23f; --lb-yel-d: #a67c00; --lb-red: #ff4d4d; --lb-red-d: #9c1f1f; --lb-cyan: #5ee7ff;
+  --lb-px: "Silkscreen", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  width: 100%; max-width: 440px; margin: 0 auto; padding: 0 0 96px; box-sizing: border-box;   /* bottom room so the skyline never covers the last button */
+}
+
+/* ---- hero ---- */
+.vs-hero { display: flex; flex-direction: column; align-items: center; gap: 6px; margin: 4px 0 18px; text-align: center; }
+.vs-hero-mascot { flex: none; width: 92px; height: 92px; filter: drop-shadow(0 8px 0 rgba(0, 0, 0, .45)) drop-shadow(0 0 18px rgba(255, 77, 77, .35)); animation: lb-bob 2.8s ease-in-out infinite; }
+.vs-hero-mascot svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.vs-hero-txt { min-width: 0; }
+#vs-lobby-screen .vs-heading { margin: 0; font-family: var(--lb-px); font-size: clamp(1.9rem, 9vw, 2.6rem); font-weight: 700; line-height: 1; letter-spacing: .06em; text-transform: uppercase;
+  color: #fff; text-shadow: 3px 3px 0 var(--lb-red-d), 6px 6px 0 #02040b; }
+#vs-lobby-screen .vs-heading b { color: var(--lb-yel); font-weight: 700; }
+#vs-lobby-screen .subtitle { max-width: 34ch; margin: 12px auto 0; font-size: .8rem; line-height: 1.5; color: var(--lb-dim); }
+@keyframes lb-bob { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-6px) rotate(3deg); } }
+
+/* ---- panels: one look for every box. Hard edge, dashed header strip made from a ::before label. ---- */
+#vs-lobby-screen .vs-profile-card, #vs-lobby-screen .vs-create-group, #vs-lobby-screen .vs-join-group, #vs-lobby-screen .vs-public-box,
+#vs-lobby-screen .vs-room-code-card, #vs-lobby-screen .vs-game-selector, #vs-lobby-screen .vs-volt-opts {
+  position: relative; margin-left: 0; margin-right: 0; max-width: none; width: 100%; padding: 12px; border: 2px solid var(--lb-line); border-radius: 4px; background: var(--lb-panel);
+  box-shadow: 0 0 0 2px var(--lb-ink), 0 8px 0 2px rgba(0, 0, 0, .35); text-align: left; }
+#vs-lobby-screen .vs-profile-card::before, #vs-lobby-screen .vs-create-group::before, #vs-lobby-screen .vs-join-group::before {
+  flex: 1 0 100%; padding-bottom: 7px; margin-bottom: 2px; border-bottom: 2px dashed var(--lb-line); font-family: var(--lb-px); font-size: .68rem; letter-spacing: .22em; text-transform: uppercase; color: var(--lb-yel); }
+#vs-lobby-screen .vs-profile-card { flex-wrap: wrap; gap: 10px 12px; align-items: center; margin-bottom: 18px; }
+#vs-lobby-screen .vs-profile-card::before { content: "Who's playing"; }
+#vs-lobby-screen .vs-profile-card.needs-name { border-color: var(--lb-yel); box-shadow: 0 0 0 2px var(--lb-ink), 0 0 0 5px rgba(255, 210, 63, .22), 0 8px 0 2px rgba(0, 0, 0, .35); }
+#vs-lobby-screen .vs-avatar-edit { font-family: var(--lb-px); background: var(--lb-yel); color: #1b1300; border-radius: 2px; letter-spacing: .06em; }
+#vs-lobby-screen .vs-name-edit-label { font-family: var(--lb-px); font-size: .6rem; letter-spacing: .2em; text-transform: uppercase; color: var(--lb-dim); }
+#vs-lobby-screen .vs-name-row input { border: 2px solid var(--lb-line); border-radius: 3px; background: var(--lb-ink); font-weight: 800; color: #fff; }
+#vs-lobby-screen .vs-name-row input:focus { border-color: var(--lb-yel); outline: none; box-shadow: 0 0 0 3px rgba(255, 210, 63, .18); }
+#vs-lobby-screen .vs-name-row .action-btn { border-radius: 3px; border: 2px solid var(--lb-line-hi); background: var(--lb-panel-2); font-family: var(--lb-px); font-size: .75rem; letter-spacing: .1em; text-transform: uppercase; }
+#vs-lobby-screen .vs-name-msg { font-size: .72rem; }
+
+/* ---- the buttons: chunky pixel slabs with a hard bottom edge that squashes on press ---- */
+#vs-lobby-screen .primary-btn, #vs-lobby-screen .vs-public-join { font-family: var(--lb-px); letter-spacing: .12em; text-transform: uppercase; border: 0; border-radius: 3px;
+  background: var(--lb-yel); color: #1b1300; box-shadow: 0 5px 0 var(--lb-yel-d), 0 0 0 2px var(--lb-ink); transition: transform .08s ease, box-shadow .08s ease, filter .15s ease; }
+#vs-lobby-screen .primary-btn:hover, #vs-lobby-screen .vs-public-join:hover:not(:disabled) { background: #ffdd66; }
+#vs-lobby-screen .primary-btn:active, #vs-lobby-screen .vs-public-join:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 1px 0 var(--lb-yel-d), 0 0 0 2px var(--lb-ink); }
+#vs-lobby-screen .vs-gated.locked { opacity: .45; filter: saturate(.2); }
+
+/* ---- the three things you can do ---- */
+#vs-lobby-screen .vs-lobby-controls { display: flex; flex-direction: column; align-items: stretch; gap: 18px; margin: 0 0 18px; }
+#vs-lobby-screen #vs-quick-play-btn { width: 100%; padding: 16px 12px 18px; font-size: 1.15rem; background: var(--lb-red); color: #fff; box-shadow: 0 6px 0 var(--lb-red-d), 0 0 0 2px var(--lb-ink), 0 0 26px rgba(255, 77, 77, .3); }
+#vs-lobby-screen #vs-quick-play-btn:hover { background: #ff6a60; }
+#vs-lobby-screen #vs-quick-play-btn:active { box-shadow: 0 1px 0 var(--lb-red-d), 0 0 0 2px var(--lb-ink); }
+#vs-lobby-screen #vs-quick-play-btn::after { content: "jump into any open public room"; display: block; margin-top: 5px; font-family: inherit; font-size: .58rem; letter-spacing: .12em; opacity: .75; }
+
+#vs-lobby-screen .vs-create-group { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+#vs-lobby-screen .vs-create-group::before { content: "Host"; }
+#vs-lobby-screen .vs-vis-toggle { flex: 1 1 180px; border: 2px solid var(--lb-line); border-radius: 3px; background: var(--lb-ink); padding: 2px; gap: 2px; }
+#vs-lobby-screen .vs-vis-toggle button { flex: 1; min-height: 40px; border-radius: 2px; background: transparent; color: var(--lb-dim); font-family: var(--lb-px); font-size: .68rem; letter-spacing: .06em; text-transform: uppercase; }
+#vs-lobby-screen .vs-vis-toggle button.on { background: var(--lb-yel); color: #1b1300; }
+#vs-lobby-screen .vs-create-group .action-btn { flex: 1 1 120px; min-height: 44px; border: 0; border-radius: 3px; background: var(--lb-panel-2); color: #fff; font-family: var(--lb-px); font-size: .78rem; letter-spacing: .12em; text-transform: uppercase;
+  box-shadow: 0 4px 0 #050a1a, 0 0 0 2px var(--lb-line-hi); transition: transform .08s ease, box-shadow .08s ease; }
+#vs-lobby-screen .vs-create-group .action-btn:hover { background: #17285a; }
+#vs-lobby-screen .vs-create-group .action-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #050a1a, 0 0 0 2px var(--lb-line-hi); }
+#vs-lobby-screen #vs-vis-hint { margin: 6px 2px 0; font-size: .78rem; color: #e8f0ff; text-align: left; padding: 8px 10px; background: rgba(8, 14, 30, .78); border: 1px solid rgba(174, 198, 234, .45); border-radius: 4px; box-shadow: 0 2px 0 rgba(0,0,0,.35); }   /* readable pill, no negative margin */
+
+#vs-lobby-screen .vs-join-group { display: flex; flex-wrap: wrap; gap: 10px; }
+#vs-lobby-screen .vs-join-group::before { content: "Join by code"; }
+#vs-lobby-screen .vs-join-group input { flex: 1 1 120px; min-height: 48px; padding: 6px 10px; border: 2px solid var(--lb-line); border-radius: 3px; background: var(--lb-ink); text-align: center;
+  font-family: var(--lb-px); font-size: 1.4rem; letter-spacing: .4em; text-indent: .4em; color: var(--lb-yel); font-variant-numeric: tabular-nums; }
+#vs-lobby-screen .vs-join-group input::placeholder { font-size: .72rem; letter-spacing: .14em; text-indent: 0; color: #4f6591; }
+#vs-lobby-screen .vs-join-group input:focus { border-color: var(--lb-yel); outline: none; box-shadow: 0 0 0 3px rgba(255, 210, 63, .18); }
+#vs-lobby-screen .vs-join-group .action-btn { flex: none; min-width: 88px; min-height: 48px; border: 0; border-radius: 3px; background: var(--lb-red); color: #fff; font-family: var(--lb-px); letter-spacing: .12em; text-transform: uppercase;
+  box-shadow: 0 4px 0 var(--lb-red-d), 0 0 0 2px var(--lb-ink); transition: transform .08s ease, box-shadow .08s ease; }
+#vs-lobby-screen .vs-join-group .action-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--lb-red-d), 0 0 0 2px var(--lb-ink); }
+
+/* The game / hearts / packs are chosen INSIDE the room (the host sees them there). Showing them in the menu too was a duplicate, so while
+   they are parked in the menu (versus.js mountGameSetup(false)) the whole block is hidden; it appears once it is moved into the room. */
+#vs-menu #vs-host-setup { display: none; }
+
+/* ---- public rooms ---- */
+#vs-lobby-screen .vs-public-box { padding: 12px 12px 6px; }
+#vs-lobby-screen .vs-public-head { align-items: center; margin: 0 0 8px; padding-bottom: 7px; border-bottom: 2px dashed var(--lb-line); }
+#vs-lobby-screen .vs-public-head h3 { margin: 0; font-family: var(--lb-px); font-size: .68rem; font-weight: 400; letter-spacing: .22em; text-transform: uppercase; color: var(--lb-yel); }
+#vs-lobby-screen .vs-public-count { font-family: var(--lb-px); font-size: .6rem; letter-spacing: .12em; text-transform: uppercase; color: var(--lb-cyan); }
+#vs-lobby-screen .vs-public-count:empty { display: none; }
+#vs-lobby-screen .vs-public-list { gap: 0; max-height: 52vh; }
+#vs-lobby-screen .vs-public-row { gap: 12px; padding: 10px 2px; border: 0; border-bottom: 1px solid rgba(74, 104, 181, .25); border-radius: 0; background: transparent; box-shadow: none; }
+#vs-lobby-screen .vs-public-row:last-child { border-bottom: 0; }
+#vs-lobby-screen .vs-public-info b { font-size: .98rem; font-weight: 800; color: #fff; }
+#vs-lobby-screen .vs-public-info > span { display: block; line-height: 1.5; font-size: .72rem; color: var(--lb-dim); }
+#vs-lobby-screen .vs-public-info .vs-dots { vertical-align: -1px; }
+#vs-lobby-screen .vs-dots i { border-radius: 1px; }
+#vs-lobby-screen .vs-badge { border-radius: 2px; font-family: var(--lb-px); font-size: .55rem; letter-spacing: .08em; }
+#vs-lobby-screen .vs-public-join { min-height: 36px; padding: 6px 14px; font-size: .7rem; }
+#vs-lobby-screen .vs-public-join:disabled { background: transparent; color: #4f6591; box-shadow: 0 0 0 2px var(--lb-line); }
+#vs-lobby-screen .vs-public-list > .vs-lobby-hint { margin: 4px 0 8px; padding: 22px 12px; border: 2px dashed var(--lb-line); border-radius: 3px; text-align: center; color: var(--lb-dim); }
+
+/* =========================== IN THE ROOM =========================== */
+#vs-lobby-screen:has(#vs-menu.hidden) { max-width: 520px; }
+#vs-lobby-screen:has(#vs-menu.hidden) .vs-hero { flex-direction: row; justify-content: center; gap: 12px; margin-bottom: 12px; text-align: left; }
+#vs-lobby-screen:has(#vs-menu.hidden) .vs-hero-mascot { width: 52px; height: 52px; }
+#vs-lobby-screen:has(#vs-menu.hidden) .subtitle { display: none; }
+#vs-lobby-screen:has(#vs-menu.hidden) .vs-heading { font-size: 1.5rem; }
+#vs-lobby-screen:has(#vs-menu.hidden) .vs-profile-card { margin-bottom: 14px; }
+#vs-lobby-screen .vs-lobby-hint { font-size: .78rem; color: var(--lb-dim); }
+
+/* room code: the thing you read out loud, so it is huge */
+#vs-lobby-screen .vs-room-code-card { display: flex; flex-direction: column; align-items: center; gap: 6px; margin: 0 0 18px; padding: 14px 12px 16px; text-align: center; }
+#vs-lobby-screen .vs-room-code-label { font-family: var(--lb-px); font-size: .62rem; letter-spacing: .24em; text-transform: uppercase; color: var(--lb-dim); }
+#vs-lobby-screen .vs-vis-badge { margin-left: 8px; padding: 2px 7px; border-radius: 2px; background: rgba(255, 255, 255, .08); color: #cfe0ff; font-family: var(--lb-px); font-size: .55rem; letter-spacing: .1em; }
+#vs-lobby-screen .vs-vis-badge.pub { background: rgba(94, 231, 255, .16); color: var(--lb-cyan); }
+#vs-lobby-screen #vs-room-code-display { font-family: var(--lb-px); font-size: clamp(2.4rem, 14vw, 3.4rem); font-weight: 700; line-height: 1; letter-spacing: .22em; text-indent: .22em; color: var(--lb-yel); text-shadow: 3px 3px 0 var(--lb-red-d), 6px 6px 0 #02040b; }
+#vs-lobby-screen .vs-copy-btn { margin-top: 6px; padding: 8px 16px; border: 2px solid var(--lb-line-hi); border-radius: 3px; background: var(--lb-panel-2); color: #fff; font-family: var(--lb-px); font-size: .66rem; letter-spacing: .14em; text-transform: uppercase; }
+#vs-lobby-screen .vs-copy-btn:hover { background: #17285a; }
+
+/* seats */
+#vs-lobby-screen .vs-slots-grid { max-width: none; gap: 10px; margin-bottom: 20px; }
+#vs-lobby-screen .vs-slot { min-height: 126px; padding: 12px 6px; border-radius: 4px; }
+#vs-lobby-screen .vs-slot.empty { border: 2px dashed var(--lb-line); background: rgba(9, 17, 38, .5); color: #4f6591; }
+#vs-lobby-screen .vs-slot.filled { border: 2px solid var(--lb-line-hi); background: var(--lb-panel); box-shadow: 0 0 0 2px var(--lb-ink), 0 6px 0 2px rgba(0, 0, 0, .35); }
+#vs-lobby-screen .vs-slot.you { border-color: var(--lb-yel); box-shadow: 0 0 0 2px var(--lb-ink), 0 0 0 4px rgba(255, 210, 63, .2), 0 6px 0 2px rgba(0, 0, 0, .35); }
+#vs-lobby-screen .vs-slot-role { border-radius: 2px; font-family: var(--lb-px); font-size: .52rem; letter-spacing: .1em; }
+#vs-lobby-screen .vs-slot.filled .vs-slot-role { background: rgba(255, 210, 63, .14); color: var(--lb-yel); border-color: rgba(255, 210, 63, .5); }
+#vs-lobby-screen .vs-slot.empty .vs-slot-role.empty-role { border-color: var(--lb-line); color: #4f6591; }
+#vs-lobby-screen .vs-slot-name { font-size: .82rem; font-weight: 800; }
+
+/* game picker: two arcade "cartridges" */
+#vs-lobby-screen .vs-game-selector { display: block; margin: 0 0 14px; }
+#vs-lobby-screen .vs-game-selector > .vs-rounds-label, #vs-lobby-screen .vs-rounds-label { display: block; margin-bottom: 8px; font-family: var(--lb-px); font-size: .62rem; font-weight: 400; letter-spacing: .22em; color: var(--lb-yel); }
+#vs-lobby-screen .vs-game-tabs { width: 100%; gap: 10px; }
+#vs-lobby-screen .vs-game-tab { padding: 12px 8px; border: 2px solid var(--lb-line); border-radius: 4px; background: var(--lb-ink); color: #fff; box-shadow: 0 4px 0 #02040b; text-align: center; }
+#vs-lobby-screen .vs-game-tab b { font-family: var(--lb-px); font-size: .74rem; letter-spacing: .08em; text-transform: uppercase; }
+#vs-lobby-screen .vs-game-tab span { color: var(--lb-dim); }
+#vs-lobby-screen .vs-game-tab.on { border-color: var(--lb-yel); background: #14224a; box-shadow: 0 4px 0 var(--lb-yel-d), 0 0 22px rgba(255, 210, 63, .22); }
+#vs-lobby-screen .vs-game-tab.volt.on { border-color: var(--lb-red); background: #3a1018; box-shadow: 0 4px 0 var(--lb-red-d), 0 0 22px rgba(255, 77, 77, .35); }
+
+/* settings: steppers + pack chips */
+#vs-lobby-screen .vs-volt-opts { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 14px; margin: 0 0 14px; }
+#vs-lobby-screen .vs-rounds-selector { justify-content: space-between; gap: 10px; margin: 0 0 10px; width: 100%; }
+#vs-lobby-screen .vs-volt-opts .vs-rounds-selector { margin-bottom: 4px; }
+#vs-lobby-screen .vs-rounds-stepper { gap: 10px; padding: 3px; border: 2px solid var(--lb-line); border-radius: 3px; background: var(--lb-ink); }
+#vs-lobby-screen .vs-stepper-btn { width: 32px; height: 32px; border: 0; border-radius: 2px; background: var(--lb-panel-2); box-shadow: 0 0 0 2px var(--lb-line-hi); font-family: var(--lb-px); }
+#vs-lobby-screen .vs-stepper-btn:hover { background: var(--lb-yel); color: #1b1300; }
+#vs-lobby-screen .vs-opt-value, #vs-lobby-screen #vs-rounds-value { min-width: 34px; font-family: var(--lb-px); font-size: .95rem; color: var(--lb-yel); }
+#vs-lobby-screen .vs-opt-hint { margin: 2px 0 8px; text-align: left; font-size: .72rem; color: var(--lb-dim); }
+#vs-lobby-screen .vs-packs { width: 100%; text-align: left; }
+#vs-lobby-screen .vs-pack-chips { justify-content: flex-start; gap: 7px; margin-top: 4px; }
+#vs-lobby-screen .vs-pack-chip { padding: 7px 10px; border: 2px solid var(--lb-line); border-radius: 3px; background: var(--lb-ink); color: var(--lb-dim); font-family: var(--lb-px); font-size: .6rem; letter-spacing: .06em; text-transform: uppercase; }
+#vs-lobby-screen .vs-pack-chip.on { background: var(--lb-yel); border-color: var(--lb-yel); color: #1b1300; }
+#vs-lobby-screen .vs-game-info { font-size: .8rem; color: var(--lb-dim); }
+
+/* start / ready / leave */
+#vs-lobby-screen #vs-start-game-btn, #vs-lobby-screen #vs-ready-btn { width: 100%; margin: 4px 0 10px; padding: 16px 12px 18px; font-size: 1.05rem; }
+#vs-lobby-screen #vs-start-game-btn:not(.hidden), #vs-lobby-screen #vs-ready-btn:not(.hidden) { display: block; }
+#vs-lobby-screen #vs-start-game-btn.ready-go { background: #4cd137; box-shadow: 0 6px 0 #1f7d12, 0 0 0 2px var(--lb-ink), 0 0 26px rgba(76, 209, 55, .35); color: #04210a; }
+#vs-lobby-screen #vs-lobby-leave-btn { display: block; margin: 8px auto 0; padding: 8px 14px; border: 0; background: transparent; color: var(--lb-dim); font-family: var(--lb-px); font-size: .66rem; letter-spacing: .14em; text-transform: uppercase; text-decoration: underline; text-underline-offset: 4px; }
+#vs-lobby-screen #vs-lobby-leave-btn:hover { color: var(--lb-red); background: transparent; }
+
+/* =========================== WIDE SCREENS: menu becomes left controls / middle scene / right public rooms =========================== */
+@media (min-width: 960px) {
+  body:has(#versus-view:not(.hidden) #vs-lobby-screen:not(.hidden)) .main-content { max-width: 1240px; }
+  #vs-lobby-screen:has(#vs-menu:not(.hidden)) { display: grid; grid-template-columns: minmax(340px, 400px) 1fr minmax(340px, 420px); column-gap: 28px; align-items: start; max-width: none; }
+  #vs-lobby-screen:has(#vs-menu:not(.hidden)) .vs-hero { grid-column: 1 / -1; margin-bottom: 26px; }
+  #vs-lobby-screen:has(#vs-menu:not(.hidden)) .vs-hero-mascot { width: 116px; height: 116px; }
+  #vs-lobby-screen:has(#vs-menu:not(.hidden)) .vs-profile-card { grid-column: 1; grid-row: 2; }
+  #vs-lobby-screen:has(#vs-menu:not(.hidden)) #vs-menu { display: contents; }
+  #vs-lobby-screen:has(#vs-menu:not(.hidden)) .vs-lobby-controls { grid-column: 1; grid-row: 3; }
+  #vs-lobby-screen:has(#vs-menu:not(.hidden)) .vs-public-box { grid-column: 3; grid-row: 2 / span 2; }
+  #vs-lobby-screen:has(#vs-menu:not(.hidden)) #vs-lobby-status { display: none; }
+}
+
+@media (max-width: 340px) {
+  .vs-hero-mascot { width: 76px; height: 76px; }
+  #vs-lobby-screen .vs-join-group input { letter-spacing: .26em; text-indent: .26em; font-size: 1.2rem; }
+  #vs-lobby-screen .vs-badge-waiting { display: none; }   /* the Join button already says "open"; this gives the name room */
+}
+/* short screens (phone with the keyboard up while typing a name/code) */
+@media (max-height: 520px) { .vs-hero { margin: 0 0 8px; } .vs-hero-mascot { width: 52px; height: 52px; } #vs-lobby-screen .subtitle { display: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .vs-hero-mascot { animation: none; }
+  #vs-lobby-screen * { transition: none !important; }
+}
+
+/* 4c: arcade-skin versions of the chunky steppers (lobby.css overrides need the #vs-lobby-screen scope to win) */
+#vs-lobby-screen .vs-volt-opts .vs-rounds-selector, #vs-lobby-screen #vs-rounds-selector { max-width: none; margin: 0 0 10px; padding: 8px 8px 8px 12px; background: var(--lb-ink); border: 2px solid var(--lb-line); border-radius: 3px; }
+#vs-lobby-screen .vs-volt-opts .vs-rounds-label, #vs-lobby-screen #vs-rounds-selector .vs-rounds-label { margin: 0; font-family: var(--lb-px); font-size: .6rem; letter-spacing: .12em; text-transform: uppercase; color: var(--lb-yel); }
+#vs-lobby-screen .vs-volt-opts .vs-stepper-btn, #vs-lobby-screen #vs-rounds-selector .vs-stepper-btn { width: 44px; height: 44px; border: 0; border-radius: 3px; background: var(--lb-panel-2); color: #fff; font-family: var(--lb-px); font-size: 1.1rem; box-shadow: 0 0 0 2px var(--lb-line-hi), 0 4px 0 2px #02040b; }
+#vs-lobby-screen .vs-volt-opts .vs-stepper-btn:active, #vs-lobby-screen #vs-rounds-selector .vs-stepper-btn:active { background: var(--lb-yel); color: #1b1300; transform: translateY(4px); box-shadow: 0 0 0 2px var(--lb-line-hi); }
+#vs-lobby-screen .vs-volt-opts .vs-opt-value, #vs-lobby-screen #vs-rounds-selector #vs-rounds-value { min-width: 46px; font-family: var(--lb-px); font-size: 1.05rem; color: var(--lb-yel); }
+#vs-lobby-screen .vs-pack-chip { min-height: 40px; padding: 9px 12px; }
+#vs-lobby-screen .vs-ready-tag { align-self: center; text-align: center; }
+#vs-lobby-screen #vs-ready-btn { margin-left: auto; margin-right: auto; }
+
+/* ==========================================================================================================
+   VERSUS STAGE: the Power Plant floor. ONE pixel-art picture (240x240, embedded below, drawn procedurally) used by the Versus menu, the room,
+   the generation vote and, behind the Voltorb's Vengeance screen. Loaded AFTER style.css / vp.css / lobby.css; delete this file + its <link> to go back.
+   Everything is laid out in PERCENTAGES OF A SQUARE (--S), so the art, the Voltorb and the ring of chairs scale as one picture.
+   On a tall phone --S is wider than the screen, so the scenery is cropped at the sides, never the middle.
+   Animations: transform / opacity only, all off for prefers-reduced-motion. No filters.
+   ========================================================================================================== */
+:root {
+  --vst-art: url("data:image/png;base64,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");
+  --vst-chair: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAcCAYAAAAAwr0iAAACAUlEQVR4nO2UsUvDQBTGP8W/QBFSCQ52cFAqioOISIaok+DQgmPBxUHsJk7O4iDolEXorG4iqM1QSpEK1mqtRYe2oGKD1u6dzkGvNrm75FJBFz8opO9e7/v1PfIB//rXH6tDttEqrxM/FysDm1J3d4kOVEUjl+cTtlqqsCwNYJXRBB6fzODZSnKBuMVcOkICfUGb6chQj6vhzd278Gx62ED1pYTRqQPGz1ZQFY0cHfai1dzLWBaEQsyH32zTYFZQKFZQKFYwo+u2C38yAQBImCYAINitAwChEAxA9WoLgbE1JEwTM/r3CrwM3NSwwgCAfWMRQM121sn7QfVqq0ndsMJoWGFMDxu+Tenn25yV8C2gEFQJrAEwpQGShyt4rdU8+xiA49QZvzOlS5t/6l6qi1lBqZ7xaSSvUj2DUt2eCdwcUBWNBLsneEc/MueFkTAuVUWzRa9fIOckfSWhDJCXRIZtA7Qql45wYXhR6yVuDvymfBPTVWwbBq7zT7i9yAIActmTZo/s+AGXIOKZzoWiAIDTfJzbt7qwgYfyIxCKEtrjBeMJsDQbb+57cKD/C0DcT3uAT1iEomTvLCqEcKVTFY3Qf803YfVQfmRqp/m4v9dQVbTVlq879IEHI5JjTTH68Gwld10BHOYMRBuKOQutEDITaAeGMeWZCwF8ArnKaejUB+ri0KrTpfSzAAAAAElFTkSuQmCC");
+  --vst-hdr: var(--header-height, 56px);
+  --S: clamp(300px, min(125vw, calc(100vh - var(--vst-hdr))), 1500px);
+  --S: clamp(300px, min(125vw, calc(100svh - var(--vst-hdr))), 1500px);
+  --vst-floor: #2b2658;
+}
+
+body:has(#versus-view:not(.hidden) #vs-lobby-screen:not(.hidden)),
+body:has(#versus-view:not(.hidden) #vs-vote-screen:not(.hidden)) { background-color: var(--vst-floor); background-image: none; }
+body:has(#versus-view:not(.hidden) #vs-lobby-screen:not(.hidden))::after,
+html body:has(#versus-view:not(.hidden) #vs-lobby-screen:not(.hidden))::after,
+body:has(#versus-view:not(.hidden) #vs-vote-screen:not(.hidden))::after { content: none; }
+html:has(#versus-view:not(.hidden) #vs-lobby-screen:not(.hidden))::before,
+html:has(#versus-view:not(.hidden) #vs-lobby-screen:not(.hidden))::after,
+html:has(#versus-view:not(.hidden) #vs-vote-screen:not(.hidden))::before,
+html:has(#versus-view:not(.hidden) #vs-vote-screen:not(.hidden))::after { content: none; }
+
+#versus-view { position: relative; }
+/* the picture is wider than the column: clip (not just hide) sideways overflow so focus / taps can never scroll the page sideways */
+html:has(#versus-view:not(.hidden)), html:has(#versus-view:not(.hidden)) body { overflow-x: clip; }
+#vs-lobby-screen { margin-top: -24px; }   /* .main-content pads 24px at the top: let the picture start right under the header */
+
+/* ---- the picture ---- */
+#vs-scene { display: none; margin-top: 0; position: fixed; z-index: -1; left: 50%; top: var(--vst-hdr); width: 100vw; height: var(--S); margin-left: -50vw; overflow: hidden; pointer-events: none; transform: none; bottom: auto; }
+body:has(#vs-lobby-screen:not(.hidden)) #vs-scene, body:has(#vs-vote-screen:not(.hidden)) #vs-scene { display: block; }
+/* in the lobby the picture scrolls with the page (the chairs are part of the page) */
+body:has(#versus-view:not(.hidden) #vs-lobby-screen:not(.hidden)) #vs-scene { position: absolute; z-index: 0; top: -24px; }
+#vs-scene::before, #vs-scene::after { content: ""; position: absolute; top: 0; width: var(--S); height: var(--S); left: 50%; background: var(--vst-art) 0 0 / 100% 100% no-repeat; image-rendering: pixelated; transform: scaleX(-1); }
+#vs-scene::before { margin-left: calc(var(--S) * -1.5); }
+#vs-scene::after { margin-left: calc(var(--S) * .5); }
+.vst-box { position: absolute !important; z-index: 1; left: 50%; top: 0; width: var(--S); height: var(--S); margin-left: calc(var(--S) / -2);
+  background: var(--vst-art) 0 0 / 100% 100% no-repeat; image-rendering: pixelated; }
+.vst-box::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 9%; background: linear-gradient(to bottom, rgba(43, 38, 88, 0), var(--vst-floor)); }
+.vst-box > * { position: absolute; }
+
+/* Voltorb: sprite width 16.5% of the picture, feet on the pad centre (50%, 55%) */
+.vst-box .vsc-glow { left: 27%; top: 43%; width: 46%; height: 21%; border-radius: 50%; background: radial-gradient(ellipse, rgba(255, 236, 203, .55), transparent 68%); animation: vsc-pulse 4s ease-in-out infinite; }
+.vst-box .vsc-shadow { left: 38.5%; top: 52.8%; width: 23%; height: 4%; border-radius: 50%; background: rgba(28, 24, 64, .5); }
+.vst-box .vsc-volt { left: 41.75%; top: 38.6%; width: 16.5%; height: 16.5%; transform-origin: 50% 100%; animation: vsc-breathe 3.8s ease-in-out infinite; }
+.vst-box .vsc-volt svg { width: 100%; height: 100%; }
+.vst-box .vsc-z { left: 58.5%; top: 37%; font: 700 calc(var(--S) * .04) var(--vb-px); color: #fff7e0; text-shadow: 1px 1px 0 #3f2a78; }
+.vst-box .vsc-z.z2 { left: 62.5%; top: 30%; font-size: calc(var(--S) * .03); }
+.vst-box .vsc-z.z3 { left: 65.5%; top: 25%; font-size: calc(var(--S) * .022); }
+.vst-box .vsc-spark { width: calc(var(--S) * .016); height: calc(var(--S) * .016); left: 37%; top: 47%; }
+.vst-box .vsc-spark.s2 { left: 61%; top: 45%; }
+.vst-box .vsc-spark.s3 { left: 50%; top: 35%; }
+body:has(#vs-vote-screen:not(.hidden)) .vst-box .vsc-glow { background: radial-gradient(ellipse, rgba(255, 77, 77, .5), transparent 68%); }
+body:has(#vs-vote-screen:not(.hidden)) #vs-scene { top: calc(var(--vst-hdr) + 8px); }
+
+/* ---- lobby text colours: arcade navy becomes plant purple ---- */
+#vs-lobby-screen { --lb-ink: #1c1840; --lb-panel: rgba(28, 24, 64, .93); --lb-panel-2: #2b2658; --lb-line: #4d4b88; --lb-line-hi: #7079b4; --lb-dim: #b4bbe4;
+  --cw: calc(var(--S) * .17); --av: calc(var(--S) * .105); position: relative; z-index: 1; padding-top: var(--S); }
+
+/* ---- MENU: title chip over the ceiling, everything else underneath the picture ---- */
+#vs-lobby-screen .vs-hero { position: absolute; top: 10px; left: 0; z-index: 3; flex-direction: row; gap: 8px; margin: 0; padding: 6px 12px 6px 8px; border: 2px solid var(--lb-line); border-radius: 4px; background: var(--lb-panel); text-align: left; }
+#vs-lobby-screen .vs-hero-mascot { width: 28px; height: 28px; animation: none; filter: none; }
+#vs-lobby-screen .vs-hero .subtitle { display: none; }
+#vs-lobby-screen .vs-heading { font-size: .95rem; letter-spacing: .08em; text-shadow: 2px 2px 0 #02040b; }
+#vs-lobby-screen:has(#vs-menu.hidden) .vs-hero { display: none; }
+
+/* ---- ROOM: chips in the corners, the wide button along the bottom of the picture, chairs on the floor ---- */
+#vs-lobby-screen:has(#vs-menu.hidden) { display: flex; flex-direction: column; }
+#vs-lobby-screen:has(#vs-menu.hidden) #vs-lobby-status { order: 1; }
+#vs-lobby-screen:has(#vs-menu.hidden) .vs-profile-card { order: 2; }
+#vs-lobby-screen .vs-room-code-card { position: absolute; top: 10px; left: 0; z-index: 3; width: auto; margin: 0; padding: 6px 12px 8px; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; }
+#vs-lobby-screen .vs-room-code-label { font-size: .5rem; letter-spacing: .18em; }
+#vs-lobby-screen #vs-room-code-display { font-size: clamp(1.5rem, 8vw, 2rem); letter-spacing: .16em; text-indent: 0; text-shadow: 2px 2px 0 var(--lb-red-d); }
+#vs-lobby-screen .vs-copy-btn { margin-top: 2px; padding: 5px 10px; font-size: .55rem; }
+#vs-lobby-status::after { content: "READY " attr(data-ready) "/" attr(data-total); position: absolute; top: 10px; right: 0; z-index: 3; padding: 9px 12px; border: 2px solid var(--lb-line); border-radius: 4px; background: var(--lb-panel);
+  font: 400 .72rem var(--lb-px); letter-spacing: .12em; color: var(--lb-cyan); box-shadow: 0 0 0 2px var(--lb-ink); }
+#vs-lobby-status:not([data-total])::after { display: none; }
+#vs-lobby-screen #vs-lobby-leave-btn { position: absolute; top: 52px; right: 0; z-index: 3; margin: 0; padding: 7px 12px; border: 2px solid var(--lb-line); border-radius: 4px; background: var(--lb-panel); text-decoration: none; }
+#vs-lobby-screen #vs-start-game-btn, #vs-lobby-screen #vs-ready-btn { position: absolute; z-index: 3; top: calc(var(--S) - 70px); left: 0; right: 0; width: min(100%, 420px); margin: 0 auto; }
+#vs-lobby-screen .vs-lobby-hint { margin: 6px 4px; text-align: center; }
+
+#vs-lobby-screen .vs-slots-grid { position: absolute; z-index: 2; top: 0; left: 50%; display: block; width: var(--S); height: var(--S); max-width: none; margin: 0 0 0 calc(var(--S) / -2); padding: 0; gap: 0; pointer-events: none; }
+#vs-lobby-screen .vs-slot { --cx: 50%; --cy: 60%; position: absolute; left: var(--cx); top: var(--cy); display: flex; flex-direction: column; align-items: center; gap: 0; width: var(--cw); min-height: 0; height: auto; margin: calc(var(--av) * -.84) 0 0 calc(var(--cw) / -2); padding: 0;
+  border: 0; border-radius: 0; background: none; box-shadow: none; transform-origin: 50% 100%; pointer-events: none; }
+#vs-lobby-screen .vs-slot.empty, #vs-lobby-screen .vs-slot.filled, #vs-lobby-screen .vs-slot.you { border: 0; background: none; box-shadow: none; }
+/* fixed seats: slot index = place on the ring, so nobody jumps when someone joins or leaves */
+#vs-lobby-screen .vs-slot:nth-child(1) { --cx: 35%; --cy: 67.5%; }
+#vs-lobby-screen .vs-slot:nth-child(2) { --cx: 65%; --cy: 67.5%; }
+#vs-lobby-screen .vs-slot:nth-child(3) { --cx: 81%; --cy: 54%; }
+#vs-lobby-screen .vs-slot:nth-child(4) { --cx: 66%; --cy: 40%; }
+#vs-lobby-screen .vs-slot:nth-child(5) { --cx: 34%; --cy: 40%; }
+#vs-lobby-screen .vs-slot:nth-child(6) { --cx: 19%; --cy: 54%; }
+/* the stool: 32x28 art, drawn UNDER the avatar so the avatar sits on the cushion (seat centre = avatar's feet) */
+#vs-lobby-screen .vs-slot::before { content: ""; position: absolute; z-index: 0; left: 50%; top: calc(var(--av) * .55); width: calc(var(--av) * 1.6); height: calc(var(--av) * 1.4); margin-left: calc(var(--av) * -.8); background: var(--vst-chair) 0 0 / 100% 100% no-repeat; image-rendering: pixelated; }
+#vs-lobby-screen .vs-slot > .vs-avatar { position: relative; z-index: 1; width: var(--av); height: var(--av); --k: calc(var(--av) / 96); }
+#vs-lobby-screen .vs-slot.empty > .vs-avatar { visibility: hidden; }
+#vs-lobby-screen .vs-slot.empty .vs-slot-role, #vs-lobby-screen .vs-slot.empty .vs-slot-name { display: none; }
+#vs-lobby-screen .vs-slot-role { display: none; }
+#vs-lobby-screen .vs-slot:nth-child(1) .vs-slot-role { display: inline-block; position: absolute; z-index: 2; top: calc(var(--av) * -.22); left: 50%; margin-left: calc(var(--av) * .12); padding: 0 4px; font-size: .46rem; background: var(--lb-yel); color: #1b1300; border-color: var(--lb-ink); }
+/* names sit BELOW the stool's foot, so they never cover the chair */
+#vs-lobby-screen .vs-slot-name { position: relative; z-index: 1; max-width: calc(var(--cw) * 1.25); margin-top: calc(var(--av) * .9); padding: 1px 6px; border-radius: 3px; background: rgba(28, 24, 64, .82); font-size: clamp(.6rem, calc(var(--S) * .027), .8rem); line-height: 1.25; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#vs-lobby-screen .vs-slot.you .vs-slot-name { background: var(--lb-yel); color: #1b1300; }
+#vs-lobby-screen .vs-ready-tag { position: relative; z-index: 1; margin-top: 2px; padding: 1px 6px; font-size: clamp(.45rem, calc(var(--S) * .02), .6rem); }
+#vs-lobby-screen .vs-kick-btn { position: absolute; z-index: 3; top: calc(var(--av) * -.3); right: 0; min-height: 26px; padding: 0 8px; pointer-events: auto; }
+@keyframes vst-chair { 0% { opacity: 0; transform: translate3d(0, -18px, 0) scale(.4); } 70% { opacity: 1; transform: translate3d(0, 2px, 0) scale(1.08); } 100% { opacity: 1; transform: none; } }
+#vs-lobby-screen .vs-slot.chair-in { animation: vst-chair .45s cubic-bezier(.2, 1.4, .4, 1) both; animation-delay: calc(var(--i, 0) * 80ms); }
+
+@media (min-width: 960px) {
+  #vs-lobby-screen:has(#vs-menu:not(.hidden)) { padding-top: 64px;   /* clears the VERSUS MODE chip */ min-height: var(--S); align-content: start; }
+  #vs-lobby-screen:has(#vs-menu.hidden) { padding-bottom: 40px; }
+  #vs-lobby-screen:has(#vs-menu:not(.hidden)) .vs-hero-mascot { width: 28px; height: 28px; }
+}
+
+/* ---- VOLTORB'S VENGEANCE screen: the same picture sits behind it (puffer.js sets --vp-cx/--vp-S/--vp-ay in layout()) ---- */
+/* Voltorb's Vengeance: the plant is the fixed #vs-scene (its mirrored strips fill the whole screen); the game screen goes transparent and shows it. puffer.js sets --vp-S / --vp-ay on <html>. */
+.vp-bg { background: none; }
+.vp-bg::before { display: none; }
+.vp-screen { background: transparent; }
+html.vp-active #vs-scene { display: block; top: var(--vp-ay, 0px); height: var(--vp-S, 600px); --S: var(--vp-S, 600px); }
+html.vp-active .vst-box > * { display: none; }   /* the game draws its own Voltorb, glow and sparks */
+html:has(#versus-view:not(.hidden)).vp-active { background: linear-gradient(to bottom, #1c1840 calc(var(--vp-ay, 0px) + var(--vp-S, 600px) * .5), #2b2658 0); }
+html.vp-active body:has(#versus-view:not(.hidden)) { background: none !important; }
+html:has(#versus-view:not(.hidden)).vp-active::before, html:has(#versus-view:not(.hidden)).vp-active::after, html.vp-active body:has(#versus-view:not(.hidden))::after { content: none; }
+.vp-prompt { background: rgba(28, 24, 64, .92); border-color: #7079b4; }   /* readable over the window */
+
+@media (prefers-reduced-motion: reduce) {
+  #vs-lobby-screen .vs-slot.chair-in { animation: none; }
+  .vst-box *, #vs-scene * { animation: none !important; }
+}
+
+/* ---- room: the name / avatar card is only needed on the menu ---- */
+#vs-lobby-screen:has(#vs-menu.hidden) .vs-profile-card { display: none; }
+/* ---- generation vote: a plant-purple panel so the text is readable over the picture ---- */
+#vs-vote-screen { position: relative; z-index: 1; margin-top: 8px; padding: 14px 12px; border: 2px solid #4d4b88; border-radius: 6px; background: rgba(28, 24, 64, .93); }
+html.vp-active .top-header { display: none; }   /* the game screen is see-through now, so the site header would show behind it */
+
+/* ---- generation vote: the Voltorb stays calm (no jolt / shake / flicker), just awake ---- */
+body:has(#vs-vote-screen:not(.hidden)) .vst-box .vsc-volt { animation: vsc-breathe 3.8s ease-in-out infinite; }
+body:has(#vs-vote-screen:not(.hidden)) .vst-box .vsc-glow { animation-duration: 4s; }
+body:has(#vs-vote-screen:not(.hidden)) #vs-scene .vst-box .vsc-spark { display: none; }
+/* ---- room: a chip that says the game options are further down (versus.js scrolls to them and hides it once you scroll) ---- */
+.vs-opts-hint { display: none; }
+#vs-lobby-screen:has(#vs-menu.hidden) .vs-opts-hint { display: block; position: fixed; z-index: 6; left: 0; right: 0; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); width: max-content; margin: 0 auto; padding: 10px 16px; border: 2px solid var(--lb-line-hi); border-radius: 4px; background: var(--lb-panel); color: #ffcb05; font: 400 .72rem var(--lb-px); letter-spacing: .12em; text-transform: uppercase; cursor: pointer; touch-action: manipulation; animation: vst-hint 1.6s ease-in-out infinite; transition: opacity .2s; }
+#vs-lobby-screen:has(#vs-menu.hidden) .vs-opts-hint.gone { opacity: 0; pointer-events: none; animation: none; }
+@keyframes vst-hint { 0%, 100% { transform: translate3d(0, 0, 0); } 50% { transform: translate3d(0, 5px, 0); } }
+@media (prefers-reduced-motion: reduce) { #vs-lobby-screen .vs-opts-hint { animation: none !important; } }
+
+/* ==========================================================================================================
+   CLASSIC WALK-OUT (built by versus.js when a Classic match starts). Everybody gets up from the plant chairs and
+   walks out to an outdoor projector screen; the race then plays there. One full-screen layer, thrown away when it
+   ends. Transform / opacity only. Tap (or Enter / Space / Esc) skips straight to the end. With reduced motion there
+   is no walking: the outdoor scene just fades in and out.
+   ========================================================================================================== */
+.vs-walkout { position: fixed; inset: 0; z-index: 9990; overflow: hidden; background: #060b18; cursor: pointer; touch-action: manipulation; opacity: 1; transition: opacity .24s ease; animation: vsw-fade-in .22s ease both; }
+.vs-walkout.out { opacity: 0; animation: none; }
+.vs-walkout > * { position: absolute; }
+
+.vsw-sky { inset: 0; background: linear-gradient(#04081a 0%, #0b1634 46%, #1a2d50 72%, #24405c 100%); }
+.vsw-sky::before { content: ""; position: absolute; inset: 0; opacity: .75;
+  background-image:
+    radial-gradient(1.5px 1.5px at 12% 16%, #e8f1ff 50%, transparent 51%),
+    radial-gradient(1px 1px at 28% 9%, #cfe0ff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 46% 21%, #e8f1ff 50%, transparent 51%),
+    radial-gradient(1px 1px at 63% 7%, #cfe0ff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 78% 17%, #e8f1ff 50%, transparent 51%),
+    radial-gradient(1px 1px at 88% 28%, #cfe0ff 50%, transparent 51%),
+    radial-gradient(1px 1px at 8% 34%, #cfe0ff 50%, transparent 51%),
+    radial-gradient(1px 1px at 38% 36%, #e8f1ff 50%, transparent 51%),
+    radial-gradient(1px 1px at 57% 33%, #cfe0ff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 71% 38%, #e8f1ff 50%, transparent 51%),
+    radial-gradient(1px 1px at 93% 44%, #cfe0ff 50%, transparent 51%),
+    radial-gradient(1px 1px at 21% 47%, #cfe0ff 50%, transparent 51%); }
+.vsw-plant { inset: -6% -2% 0; background: var(--vst-art) 50% 100% / auto 150% no-repeat, linear-gradient(#12162e, #1c1840); image-rendering: pixelated;
+  animation: vsw-plant 2.1s ease both; }
+/* the outdoor grass line */
+.vsw-ground { left: -12%; right: -12%; bottom: -8%; height: 36%; background: linear-gradient(to top, #081a13 0%, #12362a 62%, rgba(18, 54, 42, 0) 100%);
+  opacity: 0; animation: vsw-ground 2.1s ease both; }
+
+/* the projector screen everybody ends up in front of */
+.vsw-screen { left: 50%; top: 11%; width: min(78vw, 520px); height: min(42vh, 300px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  border: clamp(4px, 1.3vw, 9px) solid #131a2c; border-radius: 8px; background: linear-gradient(#fbf7e8, #e7e2d0);
+  box-shadow: 0 20px 55px rgba(0, 0, 0, .65), 0 0 90px rgba(170, 205, 255, .22); opacity: 0;
+  animation: vsw-screen 2.1s cubic-bezier(.2, .7, .3, 1) both; }
+.vsw-screen b { font: 700 clamp(11px, 3.6vw, 18px) var(--vb-px); letter-spacing: .2em; color: #5a6a9c; }
+.vsw-screen span { font: 700 clamp(24px, 9vw, 52px) var(--vb-px); letter-spacing: .06em; color: #1b2650; text-shadow: 0 2px 0 rgba(255, 255, 255, .75); }
+
+/* the line of players walking out (one group, bobbing) */
+.vsw-line { left: 0; bottom: 19%; display: flex; align-items: flex-end; gap: 12px; animation: vsw-line 1.15s cubic-bezier(.35, .05, .6, 1) both; }
+.vsw-walker { position: relative; display: block; width: 30px; height: 30px; animation: vsw-bob .55s ease-in-out infinite alternate; }
+.vsw-walker:nth-child(2n) { animation-delay: -.18s; }
+.vsw-walker:nth-child(3n) { animation-delay: -.34s; }
+.vsw-walker .vs-avatar { width: 30px; height: 30px; --k: .3125px; }
+
+.vsw-tip { left: 0; right: 0; bottom: max(8px, env(safe-area-inset-bottom)); text-align: center; font: 400 .58rem var(--lb-px); letter-spacing: .18em;
+  text-transform: uppercase; color: rgba(230, 236, 255, .55); opacity: 0; animation: vsw-tip 2.1s ease both; }
+
+@keyframes vsw-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes vsw-plant { 0%, 14% { opacity: 1; transform: none; } 42%, 100% { opacity: 0; transform: translate3d(0, 4%, 0) scale(1.04); } }
+@keyframes vsw-ground { 0%, 22% { opacity: 0; } 48%, 100% { opacity: 1; } }
+@keyframes vsw-screen {
+  0%, 14% { opacity: 0; transform: translateX(-50%) scale(.9); }
+  46%, 92% { opacity: 1; transform: translateX(-50%) scale(1); }
+  100% { opacity: .92; transform: translateX(-50%) scale(1.03); }
+}
+@keyframes vsw-line {
+  0% { transform: translate3d(-120%, 0, 0); opacity: 0; }
+  10% { opacity: 1; }
+  86% { opacity: 1; }
+  100% { transform: translate3d(118vw, 0, 0); opacity: 0; }
+}
+@keyframes vsw-bob { from { transform: translateY(0); } to { transform: translateY(-4px); } }
+@keyframes vsw-tip { 0%, 40% { opacity: 0; } 60%, 85% { opacity: 1; } 100% { opacity: 0; } }
+
+/* reduced motion: no walking, no plant sweep - just the outdoor scene and a quick fade */
+.vs-walkout.calm { animation: vsw-fade-in .3s ease; }
+.vs-walkout.calm .vsw-plant, .vs-walkout.calm .vsw-tip { display: none; }
+.vs-walkout.calm .vsw-walker { display: none; }
+.vs-walkout.calm .vsw-sky, .vs-walkout.calm .vsw-ground { opacity: 1; animation: none; }
+.vs-walkout.calm .vsw-screen { opacity: 1; transform: translateX(-50%); animation: none; }
