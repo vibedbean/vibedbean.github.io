@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PokéBlur · Daily stats</title>
+  <meta name="description" content="PokéBlur daily finisher analytics." />
+  <!-- Owner-only analytics page, not game content: keep it out of search results (same treatment as pick.html) -->
+  <meta name="robots" content="noindex" />
+
+  <!-- Same Firebase hosts the game uses; warming them makes the first read snappier -->
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
+  <!-- The site's own skin; ?v= matches index.html so a visitor who has played reuses their cached copy -->
+  <link rel="stylesheet" href="style.css?v=2026-11-12a" />
+  <link rel="icon" type="image/png" sizes="192x192" href="favicon.png" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+
+  <!-- The same Firebase compat SDK index.html loads: the anonymous daily counters live in that database -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+  <style>
+    /* stats.html-only styles. Everything else (buttons, .cmp-bars chart, .guest-credit look) is reused from
+       style.css so this page always looks like the game. */
+    /* No fixed site header on this page, so drop the 56px top offset .main-content adds for it */
+    .stats-page.main-content { margin-top: 0; padding-top: 8px; }
+
+    .st-back { color: #9ba8b0; text-decoration: none; font-size: 0.9rem; font-weight: 600; }
+    .st-back:hover { color: #ffffff; }
+
+    .st-title { margin: 2px 0 4px; font-size: 1.5rem; font-weight: 800; color: #ff5350; letter-spacing: -0.5px; }
+
+    .st-status { font-size: 0.82rem; color: #9ba8b0; margin: 0 0 16px; min-height: 1.2em; }
+    .st-status .action-btn { padding: 6px 14px; font-size: 0.8rem; margin-left: 6px; }
+
+    .st-card { width: 100%; background-color: #222e35; border: 1px solid #2a373d; border-radius: 12px; padding: 16px; margin-bottom: 16px; text-align: left; }
+    .st-card-title { margin: 0 0 10px; font-size: 0.78rem; font-weight: 700; color: #ffcb05; text-transform: uppercase; letter-spacing: 0.5px; }
+    .st-hint { display: block; font-size: 0.72rem; color: #9ba8b0; line-height: 1.45; }
+
+    /* Day nav: prev / date / next on one row; the input grows */
+    .st-nav { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+    .st-nav .action-btn { flex: none; padding: 10px 12px; font-size: 0.9rem; }
+    /* 1rem = 16px: smaller input fonts make iOS zoom the whole page on focus */
+    .st-input { flex: 1; min-width: 0; padding: 10px 12px; font-size: 1rem; border-radius: 8px; border: 1px solid #3a4b52; background-color: #1a262c; color: #ffffff; outline: none; font-family: inherit; }
+    .st-input:focus { border-color: #3b82f6; }
+
+    .st-line { margin: 4px 0; font-size: 0.85rem; color: #c2ccd4; }
+    .st-line b { color: #ffcb05; }
+    .st-empty { margin: 6px 0; font-size: 0.85rem; color: #9fd6ff; }
+
+    .st-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+    .st-table th { padding: 4px 8px 2px; text-align: left; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.4px; color: #9ba8b0; }
+    .st-table td { padding: 3px 8px; font-size: 0.85rem; color: #c2ccd4; border-top: 1px solid #2a373d; }
+  </style>
+</head>
+<body>
+  <main class="main-content stats-page">
+    <a class="st-back" href="index.html">&#8592; PokéBlur</a>
+    <h1 class="st-title">Daily stats</h1>
+    <p class="subtitle">How many people finished each day's Daily, straight from the anonymous score counters.</p>
+    <p class="st-status" id="st-status">Connecting&hellip;</p>
+
+    <section class="st-card">
+      <p class="st-card-title">One day</p>
+      <div class="st-nav">
+        <button type="button" id="st-prev" class="action-btn" aria-label="Previous day">&#9664;</button>
+        <input type="date" id="st-date" class="st-input" aria-label="Day to show" />
+        <button type="button" id="st-next" class="action-btn" aria-label="Next day">&#9654;</button>
+      </div>
+      <div id="st-day"></div>
+    </section>
+
+    <section class="st-card">
+      <p class="st-card-title">All-time</p>
+      <div id="st-all"></div>
+      <span class="st-hint">Counts every day since 2026-11-11, the day the finisher counters went live. Reload the page to refresh.</span>
+    </section>
+  </main>
+
+  <!-- settings.js is only here for the html.touch-ui phone class (it shows no panel without a settings button).
+       pbkeyboard.js is deliberately NOT here: it only manages the game's answer boxes. -->
+  <script src="settings.js?v=2026-11-12a"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    // Mirrors versus.js's Firebase init (same public config, same compat SDK) instead of loading versus.js
+    // itself: booting the whole Versus system here would drag in PeerJS wiring and lobby DOM that doesn't
+    // exist on this page. The daily counters are readable by these same rules, so nothing else is needed.
+    const FIREBASE_CONFIG = {
+      apiKey: 'AIzaSyA84XCKdHm-YDJDmNpq26KDKCwjlPf4KTU',
+      authDomain: 'pokeblur.firebaseapp.com',
+      databaseURL: 'https://pokeblur-default-rtdb.asia-southeast1.firebasedatabase.app',
+      projectId: 'pokeblur',
+      appId: '1:991623174583:web:5ce0897e1b66eda2ccb032'
+    };
+    const AEST_MS = 10 * 60 * 60 * 1000;   // fixed UTC+10 all year (Queensland has no DST) - same as game.js
+    const STATS_SINCE = '2026-11-11';       // first day the daily counters existed (the day the rules went live)
+    const READ_TIMEOUT_MS = 8000;          // same cap the game's comparison read uses
+    const MIN_BEST_AVG_FINISHERS = 3;      // a "best average" from 1-2 finishes is one player's lucky day, not a best day
+
+    const $ = id => document.getElementById(id);
+    const statusEl = $('st-status');
+    const dateEl = $('st-date');
+    const dayBox = $('st-day');
+    const allBox = $('st-all');
+    const prevBtn = $('st-prev');
+    const nextBtn = $('st-next');
+
+    let db = null;
+    function initDb() {
+      if (db) return db;
+      try {
+        if (!window.firebase || !FIREBASE_CONFIG.databaseURL || !FIREBASE_CONFIG.apiKey) return null;
+        if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+        db = firebase.database();
+      } catch (e) { db = null; }
+      return db;
+    }
+
+    // ---- date helpers (UTC-midnight maths only: no local DST can ever shift a day) ----
+
+    function aestToday() {
+      const s = new Date(Date.now() + AEST_MS);
+      return s.getUTCFullYear() + '-' + String(s.getUTCMonth() + 1).padStart(2, '0') + '-' + String(s.getUTCDate()).padStart(2, '0');
+    }
+
+    function stepDay(dateStr, days) {
+      const d = new Date(dateStr + 'T00:00:00Z');
+      d.setUTCDate(d.getUTCDate() + days);
+      return d.toISOString().slice(0, 10);
+    }
+
+    // Same shape check as the game: only scores 0-25 with positive counts ever get counted.
+    function tallyDay(val) {
+      const tally = new Array(26).fill(0);
+      let total = 0, sum = 0;
+      Object.keys(val || {}).forEach(k => {
+        const s = +k, n = +val[k];
+        if (!Number.isInteger(s) || s < 0 || s > 25 || !(n > 0)) return;
+        tally[s] += n; total += n; sum += s * n;
+      });
+      return { tally, total, sum };
+    }
+
+    // One dated read, raced against a timeout so a stuck connection can never wedge the page.
+    // Returns {ok, val}: an empty day is a SUCCESSFUL read whose val is null (Firebase resolves a
+    // missing path to an empty snapshot), so a null val must never be mistaken for a failed read.
+    function readDay(database, date) {
+      return Promise.race([
+        database.ref('daily/' + date).once('value')
+          .then(snap => ({ ok: true, val: snap.val() }))
+          .catch(() => ({ ok: false })),
+        new Promise(resolve => setTimeout(() => resolve({ ok: false }), READ_TIMEOUT_MS))
+      ]);
+    }
+
+    // ---- connection windows ----
+
+    // Several things can read at once (the boot scan plus whatever day the user taps to), so the connection
+    // is refcounted: goOnline on the first reader, goOffline only when the last one is done. Same free-plan
+    // frugality versus.js practices, adapted to a page that owns its connection outright.
+    let openWindows = 0;
+    async function withConnection(fn) {
+      openWindows++;
+      try { db.goOnline(); } catch (e) {}
+      try { return await fn(); }
+      finally {
+        openWindows--;
+        if (openWindows <= 0) { try { db.goOffline(); } catch (e) {} }
+      }
+    }
+
+    // ---- one day ----
+
+    let paintedDay = null;   // a slow read must not paint over a newer day the user switched to
+
+    async function showDay(date) {
+      paintedDay = date;
+      dateEl.value = date;   // the picker stays in step with arrow navigation
+      setNavEnabled(false);
+      dayBox.innerHTML = '<p class="st-empty">Loading ' + date + '\u2026</p>';
+      const r = await withConnection(() => readDay(db, date));
+      if (paintedDay !== date) return;   // the user moved on while this read was in flight
+      renderDay(date, tallyDay(r.ok ? r.val : null), !r.ok);
+      updateNav();
+    }
+
+    function renderDay(date, t, readFailed) {
+      if (readFailed) {
+        dayBox.innerHTML = '<p class="st-empty">Couldn\u2019t read the counters (offline or blocked).</p>';
+        return;
+      }
+      if (!t.total) {
+        dayBox.innerHTML = '<p class="st-empty">No finishes recorded for ' + date + '.</p>';
+        return;
+      }
+      const avg = (t.sum / t.total).toFixed(1);
+      const maxCount = Math.max.apply(null, t.tally);
+      // .cmp-bars/.cmp-bar/.cmp-axis come from style.css (the game's comparison chart): same look, no "You" marker here
+      let bars = '', axis = '', rows = '';
+      for (let s = 0; s <= 25; s++) {
+        const h = Math.max(Math.round(100 * t.tally[s] / maxCount), t.tally[s] > 0 ? 3 : 0);
+        bars += '<div class="cmp-bar" style="height:' + h + '%"></div>';
+        axis += '<span>' + (s % 5 === 0 ? s : '') + '</span>';
+        if (t.tally[s]) rows += '<tr><td>' + s + '</td><td>' + t.tally[s] + '</td></tr>';
+      }
+      dayBox.innerHTML =
+        '<p class="st-line"><b>' + t.total + '</b> finished \u00b7 average <b>' + avg + '</b> / 25</p>' +
+        '<div class="cmp-bars" aria-hidden="true">' + bars + '</div>' +
+        '<div class="cmp-axis" aria-hidden="true">' + axis + '</div>' +
+        '<table class="st-table"><tr><th>score</th><th>players</th></tr>' + rows + '</table>';
+    }
+
+    // ---- all-time ----
+
+    async function scanAll() {
+      const dates = [];
+      const today = new Date(aestToday() + 'T00:00:00Z');
+      for (let d = new Date(STATS_SINCE + 'T00:00:00Z'); d <= today; d.setUTCDate(d.getUTCDate() + 1)) {
+        dates.push(d.toISOString().slice(0, 10));
+      }
+      // Read in small parallel waves instead of one shot: keeps the single connection calm while still
+      // finishing the (currently tiny) history quickly. One day is added per day, so this stays cheap.
+      const found = {};
+      let missed = 0;   // days whose read failed/timed out, so the all-time card can say its totals are short
+      const WAVE = 10;
+      for (let i = 0; i < dates.length; i += WAVE) {
+        const rs = await Promise.all(dates.slice(i, i + WAVE).map(d => readDay(db, d)));
+        dates.slice(i, i + WAVE).forEach((d, j) => {
+          if (!rs[j].ok) missed++;
+          else if (rs[j].val) found[d] = rs[j].val;
+        });
+      }
+      return { found, missed };
+    }
+
+    function renderAll(scan) {
+      const entries = Object.keys(scan.found).map(d => {
+        const t = tallyDay(scan.found[d]);
+        return { date: d, total: t.total, avg: t.total ? t.sum / t.total : 0 };
+      }).filter(e => e.total > 0);
+      if (!entries.length) {
+        allBox.innerHTML = '<p class="st-empty">No finishes recorded yet.</p>';
+        return;
+      }
+      entries.sort((a, b) => b.total - a.total || (a.date < b.date ? -1 : 1));
+      const grand = entries.reduce((n, e) => n + e.total, 0);
+      const busiest = entries[0];
+      const best = entries.filter(e => e.total >= MIN_BEST_AVG_FINISHERS)
+        .sort((a, b) => b.avg - a.avg || (a.date < b.date ? -1 : 1))[0];
+      const perDay = (grand / entries.length).toFixed(1);
+      const topRows = entries.slice(0, 5)
+        .map(e => '<tr><td>' + e.date + '</td><td>' + e.total + '</td><td>' + e.avg.toFixed(1) + '</td></tr>').join('');
+      allBox.innerHTML =
+        '<p class="st-line"><b>' + grand + '</b> finishes across <b>' + entries.length + '</b> day' + (entries.length === 1 ? '' : 's') + ' \u00b7 ' + perDay + ' per day</p>' +
+        '<p class="st-line">Busiest day: <b>' + busiest.date + '</b> \u00b7 ' + busiest.total + ' finished</p>' +
+        '<p class="st-line">Best average: ' + (best
+          ? '<b>' + best.date + '</b> \u00b7 ' + best.avg.toFixed(1) + ' / 25'
+          : '\u2014 needs a day with ' + MIN_BEST_AVG_FINISHERS + '+ finishers') + '</p>' +
+        '<table class="st-table"><tr><th>day</th><th>finishers</th><th>average</th></tr>' + topRows + '</table>' +
+        (scan.missed ? '<p class="st-empty">Couldn\u2019t read ' + scan.missed + ' of the days \u2014 those aren\u2019t counted above. Reload to retry.</p>' : '');
+    }
+
+    // ---- nav ----
+
+    function setNavEnabled(on) {
+      prevBtn.disabled = !on;
+      nextBtn.disabled = !on;
+      dateEl.disabled = !on;
+    }
+
+    function updateNav() {
+      dateEl.max = aestToday();              // native pickers grey out future days
+      nextBtn.disabled = !dateEl.value || dateEl.value >= dateEl.max;
+      prevBtn.disabled = !dateEl.value;
+      dateEl.disabled = false;
+    }
+
+    prevBtn.addEventListener('click', () => { if (dateEl.value) showDay(stepDay(dateEl.value, -1)); });
+    nextBtn.addEventListener('click', () => { if (dateEl.value && dateEl.value < aestToday()) showDay(stepDay(dateEl.value, 1)); });
+    // The native date picker fires change on pick, so no separate Go button is needed (same as pick.html)
+    dateEl.addEventListener('change', () => { if (dateEl.value) showDay(dateEl.value); });
+
+    // ---- boot ----
+
+    async function boot() {
+      if (!initDb()) {
+        statusEl.replaceChildren(document.createTextNode('Couldn\u2019t reach Firebase. '));
+        const retry = document.createElement('button');
+        retry.type = 'button';
+        retry.className = 'action-btn';
+        retry.textContent = 'Try again';
+        retry.addEventListener('click', () => { statusEl.textContent = 'Connecting\u2026'; boot(); });
+        statusEl.appendChild(retry);
+        dayBox.innerHTML = '';
+        allBox.innerHTML = '';
+        return;
+      }
+      dateEl.value = aestToday();   // defaults to today, so it updates each day on its own
+      updateNav();
+      await showDay(dateEl.value);
+      allBox.innerHTML = '<p class="st-empty">Loading every day\u2026</p>';
+      // The scan rides the same refcounted connection as day reads, so a day tap during it can't cut it off.
+      try {
+        const scan = await withConnection(scanAll);
+        renderAll(scan);
+      } catch (e) {
+        allBox.innerHTML = '<p class="st-empty">Couldn\u2019t read the counters (offline or blocked).</p>';
+      }
+      statusEl.textContent = 'Updated ' + new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    }
+
+    boot();
+  })();
+  </script>
+</body>
+</html>
